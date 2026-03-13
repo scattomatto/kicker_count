@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Calcetto Stats Pro</title>
     <style>
-        :root { --p: #2563eb; --bg: #f8fafc; --card: #ffffff; --team1: #A6F864; --team2: #1E3E4F; }
+        :root { --p: #2563eb; --bg: #f8fafc; --card: #ffffff; --team1: #A6F864; --team2: #1E3E4F; --wa: #25D366; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 20px; overflow-x: hidden; }
         
         /* Home */
@@ -20,7 +20,7 @@
         .match-timestamp { font-size: 0.8rem; color: #64748b; }
         .match-score-line { font-size: 0.9rem; font-weight: bold; color: #1e293b; }
         
-        .btn-new { background: var(--p); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; font-size: 1rem; margin-bottom: 20px; }
+        .btn-new { background: var(--p); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; font-size: 1rem; margin-bottom: 20px; cursor: pointer; }
 
         .backup-section { margin-top: 30px; padding: 15px; background: #f1f5f9; border-radius: 12px; border: 1px dashed #cbd5e1; text-align: center; }
         .btn-backup { background: #64748b; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; margin: 5px; font-weight: bold; }
@@ -50,7 +50,7 @@
         .label-b { background: var(--team2); color: #fff; }
 
         .player-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
-        .btn-inc { width: 36px; height: 36px; border-radius: 50%; border: none; background: #f1f5f9; font-size: 1.2rem; font-weight: bold; }
+        .btn-inc { width: 36px; height: 36px; border-radius: 50%; border: none; background: #f1f5f9; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
         .btn-plus { background: #dcfce7; color: #166534; }
         .btn-del-p { background: #fee2e2; border: none; color: #ef4444; font-weight: bold; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; margin-right: 10px; }
         
@@ -64,7 +64,10 @@
         .stats-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; color: #64748b; }
         .stats-row { font-size: 0.85rem; padding: 2px 0; border-bottom: 1px dotted #eee; display: flex; justify-content: space-between; }
 
-        .btn-del { background: #fee2e2; color: #991b1b; border: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; margin-top: 20px; width: 100%; }
+        /* Tasto WhatsApp */
+        .btn-wa { background: var(--wa); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; font-size: 0.9rem; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; text-decoration: none; }
+
+        .btn-del { background: #fee2e2; color: #991b1b; border: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; margin-top: 20px; width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -104,13 +107,13 @@
             <div class="player-list-box box-team-a">
                 <span class="label-team label-a" id="label-a">Gialli</span>
                 <div id="list-a"></div>
-                <button onclick="addPlayer('a')" style="width:100%; border:1px dashed var(--team1); background:none; padding:10px; margin-top:10px; border-radius:8px; font-weight:bold">+ Aggiungi</button>
+                <button onclick="addPlayer('a')" style="width:100%; border:1px dashed var(--team1); background:none; padding:10px; margin-top:10px; border-radius:8px; font-weight:bold; cursor:pointer">+ Aggiungi</button>
             </div>
 
             <div class="player-list-box box-team-b">
                 <span class="label-team label-b" id="label-b">Blu</span>
                 <div id="list-b"></div>
-                <button onclick="addPlayer('b')" style="width:100%; border:1px dashed var(--team2); background:none; padding:10px; margin-top:10px; border-radius:8px; font-weight:bold">+ Aggiungi</button>
+                <button onclick="addPlayer('b')" style="width:100%; border:1px dashed var(--team2); background:none; padding:10px; margin-top:10px; border-radius:8px; font-weight:bold; cursor:pointer">+ Aggiungi</button>
             </div>
 
             <div class="player-list-box" style="border:1px solid #e2e8f0">
@@ -120,6 +123,10 @@
                 <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px">
                     <strong style="font-size:0.9rem">Riepilogo Marcatori:</strong>
                     <div class="stats-container" id="goal-rank"></div>
+                    
+                    <button class="btn-wa" onclick="shareWhatsApp()">
+                        <span>📲 Condividi su WhatsApp</span>
+                    </button>
                 </div>
             </div>
 
@@ -129,11 +136,11 @@
     </div>
 
 <script>
-    let fullData = JSON.parse(localStorage.getItem('calcetto_v13')) || { appTitle: "⚽ Calcetto Log", matches: {} };
+    let fullData = JSON.parse(localStorage.getItem('calcetto_v14')) || { appTitle: "⚽ Calcetto Log", matches: {} };
     let activeId = null;
     let manualScore = false;
 
-    function save() { localStorage.setItem('calcetto_v13', JSON.stringify(fullData)); renderHome(); }
+    function save() { localStorage.setItem('calcetto_v14', JSON.stringify(fullData)); renderHome(); }
     function saveAppTitle() { fullData.appTitle = document.getElementById('main-app-title').value; save(); }
 
     function renderHome() {
@@ -243,6 +250,37 @@
         rankDiv.innerHTML = getRankHtml(m.teamA, m.playersA, 'stats-box-a') + getRankHtml(m.teamB, m.playersB, 'stats-box-b');
         
         save();
+    }
+
+    // FUNZIONE CONDIVISIONE WHATSAPP
+    function shareWhatsApp() {
+        if(!activeId) return;
+        const m = fullData.matches[activeId];
+        
+        let text = `⚽ *${m.title}* (${m.date})\n\n`;
+        text += `🏆 *RISULTATO FINALE*\n`;
+        text += `${m.teamA}  *${m.scoreA} - ${m.scoreB}* ${m.teamB}\n\n`;
+        
+        text += `🎯 *MARCATORI*\n`;
+        
+        // Squadra A
+        text += `*${m.teamA}:*\n`;
+        [...m.playersA].sort((a,b) => b.g - a.g).forEach((p, i) => {
+            text += `${i+1}) ${p.n}: ${p.g}\n`;
+        });
+        
+        // Squadra B
+        text += `\n*${m.teamB}:*\n`;
+        [...m.playersB].sort((a,b) => b.g - a.g).forEach((p, i) => {
+            text += `${i+1}) ${p.n}: ${p.g}\n`;
+        });
+
+        if(m.notes) {
+            text += `\n📝 *NOTE:*\n${m.notes}`;
+        }
+
+        const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
     }
 
     function delP(side, index, playerName) {
